@@ -11,14 +11,14 @@ void main() {
     ssize_t readNb; // Nombre de caractères lus
 
     while (1) {
-        write(1, "enseash % ", 11); // Affiche le prompt
+        write(1, "enseash % ", 11);
         
         readNb = read(0, buf, BUF_SIZE); // Lit la commande de l'utilisateur
         if (readNb == -1) {
             perror("read");
             exit(EXIT_FAILURE);
         } else if (readNb == 0) { // Si l'utilisateur tape Ctrl+d (EOF)
-            write(1, "\nBye bye...\n", 12); // Affiche le message
+            write(1, "\nBye bye...\n", 12);
         }
 
         buf[readNb - 1] = '\0'; // Remplace le saut de ligne par le caractère de fin de chaîne
