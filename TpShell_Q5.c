@@ -5,14 +5,14 @@
 #include <sys/wait.h>
 #include <time.h>
 
-#define BUF_SIZE 100 // Taille attendue de l'entrée
+#define BUF_SIZE 100 					// Taille attendue de l'entrée
 
 void main() {
     char buf[BUF_SIZE];
-    ssize_t readNb; // Nombre de caractères lus
-    int previousStatus = 0; // Code de retour précédent initialisé à 0
+    ssize_t readNb; 					// Nombre de caractères lus
+    int previousStatus = 0; 				// Code de retour précédent initialisé à 0
 
-    struct timespec startTime, endTime; // Structures pour stocker le temps de début et de fin
+    struct timespec startTime, endTime; 		// Structures pour stocker le temps de début et de fin
 
     while (1) {
         char prompt[50]; // Chaîne pour le prompt
