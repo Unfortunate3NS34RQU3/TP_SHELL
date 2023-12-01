@@ -4,16 +4,16 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define TAILLE_BUF 100 // Taille attendue de l'entrée
+#define BUF_SIZE 100 // Taille attendue de l'entrée
 
 void main() {
-    char buf[TAILLE_BUF];
+    char buf[BUF_SIZE];
     ssize_t readNb; //nombre de caractères lus
 
     while (1) {
         write(1, "enseash % ", 11); // Affiche le prompt, 1 : sortie standard, et 11 : nombre de caractères à écrire à savoir 10 pour la chaîne "enseash % " + le caractère de fin de chaine "\0"  
         
-        readNb = read(0, buf, TAILLE_BUF); // Lit la commande de l'utilisateur
+        readNb = read(0, buf, BUF_SIZE); // Lit la commande de l'utilisateur
         if (readNb == -1) {
             perror("read");
             exit(EXIT_FAILURE);
