@@ -8,7 +8,7 @@
 
 void main() {
     char buf[TAILLE_BUF];
-    ssize_t readNb; // nombre de caractères lus
+    ssize_t readNb; // Nombre de caractères lus
 
     while (1) {
         write(1, "enseash % ", 11); // Affiche le prompt
@@ -18,14 +18,13 @@ void main() {
             perror("read");
             exit(EXIT_FAILURE);
         } else if (readNb == 0) { // Si l'utilisateur tape Ctrl+d (EOF)
-            printf("\nBye bye...\n");
-            break;
+            write(1, "\nBye bye...\n", 12); // Affiche le message
         }
 
         buf[readNb - 1] = '\0'; // Remplace le saut de ligne par le caractère de fin de chaîne
 
         if (strcmp(buf, "exit") == 0) { // Si l'utilisateur saisit "exit"
-            printf("\nBye bye...\n");
+            write(1, "\nBye bye...\n", 12);
             break;
         }
 

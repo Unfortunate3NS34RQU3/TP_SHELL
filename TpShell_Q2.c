@@ -11,7 +11,7 @@ void main() {
     ssize_t readNb; //nombre de caractères lus
 
     while (1) {
-        write(1, "enseash % ", 11); // Affiche le prompt
+        write(1, "enseash % ", 11); // Affiche le prompt, 1 : sortie standard, et 11 : nombre de caractères à écrire à savoir 10 pour la chaîne "enseash % " + le caractère de fin de chaine "\0"  
         
         readNb = read(0, buf, TAILLE_BUF); // Lit la commande de l'utilisateur
         if (readNb == -1) {
