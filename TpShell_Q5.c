@@ -33,7 +33,7 @@ void main() {
                 write(1, exitStatusStr, promptLength); 	// Affiche le code de retour avec le temps d'exécution
             }
 
-	else {
+	    else {
                 int signalNum = WTERMSIG(previousStatus);
                 char signalNumStr[30];
                 // Formatage du prompt avec le signal et le temps d'exécution

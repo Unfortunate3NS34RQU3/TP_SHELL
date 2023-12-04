@@ -59,6 +59,7 @@ void main() {
 
         pid_t pid = fork(); 				// Crée un nouveau processus
         if (pid == 0) {
+
             // Processus enfant
             execlp(buf, buf, (char *)NULL); 		// Exécute la commande saisie
             perror("execlp"); 				// Gère l'erreur si l'exécution échoue
