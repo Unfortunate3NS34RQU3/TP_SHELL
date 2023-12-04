@@ -17,16 +17,20 @@ void main() {
 
         if (previousStatus == 0) {
             write(1, "enseash % ", 11); 		// Affiche le prompt initial + a chaque fois la commande précedante est correcte
-        } else {
+        }
+
+	else {
         
-            if (WIFEXITED(previousStatus)) { 		// ici si par exemple le fichier n'existe pas 
+            if (WIFEXITED(previousStatus)) { 		// Ici si par exemple le fichier n'existe pas 
                 int exitStatus = WEXITSTATUS(previousStatus);
                 char exitStatusStr[20];
                 promptLength = sprintf(exitStatusStr, "[exit:%d] %%", exitStatus);
                 write(1, "enseash ", 8);
                 write(1, exitStatusStr, promptLength); 	// Affiche le code de retour
                 
-            } else {  					//ici si un signal fais l'interruption on envoie son numero
+            }
+
+	else {  					// Ici si un signal fais l'interruption on envoie son numero
                 int signalNum = WTERMSIG(previousStatus);
                 char signalNumStr[20];
                 promptLength = sprintf(signalNumStr, "[sign:%d] %% ", signalNum);
@@ -39,7 +43,9 @@ void main() {
         if (readNb == -1) {
             perror("read");
             exit(EXIT_FAILURE);
-        } else if (readNb == 0) { 			// Si l'utilisateur tape Ctrl+d (EOF)
+        }
+
+	else if (readNb == 0) { 			// Si l'utilisateur tape Ctrl+d (EOF)
             write(1, "\nBye bye...\n", 12);
             break;
         }
@@ -58,7 +64,9 @@ void main() {
             perror("execlp"); 				// Gère l'erreur si l'exécution échoue
             exit(EXIT_FAILURE); 			// Termine le processus enfant en cas d'échec
             //kill(0,SIGINT);
-        } else {
+        }
+
+	else {
             // Processus parent
             waitpid(pid, &previousStatus, 0); 		// Attend la fin du processus enfant et récupère le statut
         }
