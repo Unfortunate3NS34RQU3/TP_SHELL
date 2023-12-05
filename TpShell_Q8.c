@@ -34,7 +34,7 @@ int main() {
                 write(1, "enseash ", 8);
                 write(1, exitStatusStr, promptLength); 		// Affiche le code de retour avec le temps d'exécution
             }
-		
+
 	    else {
                 // Si le processus précédent s'est terminé par un signal
                 int signalNum = WTERMSIG(previousStatus);
@@ -97,34 +97,85 @@ int main() {
             outputRedirect = strtok(buf, "<");
 	    inputRedirect = strtok(NULL, "<");
 	    if (inputRedirect != NULL) {
-    		inputRedirect = strtok(inputRedirect, " \t\n"); 	// Supprimer les espaces en début/fin
-   		fd = open(inputRedirect, O_RDONLY);
-    		if (fd == -1) {
+    	    	inputRedirect = strtok(inputRedirect, " \t\n"); 		// Supprimer les espaces en début/fin
+    	   	fd = open(inputRedirect, O_RDONLY);
+    	    	if (fd == -1) {
         		perror("Erreur lors de l'ouverture du fichier en entrée");
         		exit(EXIT_FAILURE);
-    	     	}
-    	     	dup2(fd, STDIN_FILENO); 		// Redirige l'entrée standard depuis le fichier
-    		close(fd);
-    		strcpy(buf, outputRedirect); 		// Modifie le buffer pour exclure la partie de redirection
+    	    	}
+    	    dup2(fd, STDIN_FILENO); 					// Redirige l'entrée standard depuis le fichier
+    	    close(fd);
+    	    strcpy(buf, outputRedirect); 				// Modifie le buffer pour exclure la partie de redirection
 	    }
 
-            // Séparation des arguments pour l'exécution
-            argv[0] = strtok(buf, " ");
-            while (argv[i] != NULL) {
-                i++;
-                argv[i] = strtok(NULL, " ");
-            }
+	////////////pipe///////////////
+	char *left_pipe = strtok(buf, "|");
+	char *right_pipe = strtok(NULL, "|");
 
-            // Exécution de la commande
-            execvp(argv[0], argv);
-            // En cas d'échec de l'exécution, affiche un message d'erreur
-            write(STDOUT_FILENO, "Erreur lors de l'exécution de la commande.\n", strlen("Erreur lors de l'exécution de la commande.\n"));
-            exit(EXIT_FAILURE);
+	if (right_pipe != NULL) {
+    		int pipefd[2];
+    		if (pipe(pipefd) == -1) {
+        		perror("Erreur lors de la création du pipe");
+        		exit(EXIT_FAILURE);
+    		}
+
+    		pid_t pid_pipe = fork();
+    		if (pid_pipe == 0) {
+        		close(pipefd[0]); 				// Fermeture de la lecture dans le fils
+        		dup2(pipefd[1], STDOUT_FILENO); 		// Rediriger la sortie vers le pipe
+        		close(pipefd[1]); 				// Fermer le descripteur de fichier inutilisé
+
+        // Exécuter la première partie de la commande avant le pipe
+        		char *argv_pipe[BUF_SIZE / 2] = {NULL};
+        		int i_pipe = 0;
+        		argv_pipe[0] = strtok(left_pipe, " ");
+        		while (argv_pipe[i_pipe] != NULL) {
+            			i_pipe++;
+            			argv_pipe[i_pipe] = strtok(NULL, " ");
+        		}
+       			execvp(argv_pipe[0], argv_pipe);
+        		exit(EXIT_FAILURE);
+    		}
+
+		else {
+        		close(pipefd[1]); 				// Fermeture de l'écriture dans le parent
+        		waitpid(pid_pipe, NULL, 0);
+       
+        // Rediriger l'entrée du prochain processus depuis le pipe
+        		dup2(pipefd[0], STDIN_FILENO);
+        		close(pipefd[0]); 				// Fermeture du descripteur de fichier inutilisé
+
+        // Exécuter la seconde partie de la commande après le pipe
+        		char *argv_pipe[BUF_SIZE / 2] = {NULL};
+        		int i_pipe = 0;
+        		argv_pipe[0] = strtok(right_pipe, " ");
+        		while (argv_pipe[i_pipe] != NULL) {
+            			i_pipe++;
+            			argv_pipe[i_pipe] = strtok(NULL, " ");
+        		}
+        		execvp(argv_pipe[0], argv_pipe);
+        		exit(EXIT_FAILURE);
+    		}
+	}
+	//////////////////////////
+
+        // Séparation des arguments pour l'exécution
+     	argv[0] = strtok(buf, " ");
+        while (argv[i] != NULL) {
+      		i++;
+                argv[i] = strtok(NULL, " ");
+        }
+
+        // Exécution de la commande
+        execvp(argv[0], argv);
+        // En cas d'échec de l'exécution, affiche un message d'erreur
+        write(STDOUT_FILENO, "Erreur lors de l'exécution de la commande.\n", strlen("Erreur lors de l'exécution de la commande.\n"));
+        exit(EXIT_FAILURE);
         }
 
 	else {
             // Processus parent
-            waitpid(pid, &previousStatus, 0); 		// Attend la fin du processus enfant
+            waitpid(pid, &previousStatus, 0); 				 // Attend la fin du processus enfant
             // Mesure du temps de fin d'exécution
             clock_gettime(CLOCK_MONOTONIC, &endTime);
         }
